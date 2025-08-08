@@ -1,0 +1,163 @@
+{
+  "notebook": [
+    {
+      "section": "1. Introduction",
+      "markdown": "# 1. Introduction\n\nThis notebook aims to predict the salaries of baseball players using various regression models. We will explore, preprocess, and model the data to find the best approach for salary prediction.",
+      "code": ""
+    },
+    {
+      "section": "2. Data Loading and Overview",
+      "markdown": "# 2. Data Loading and Overview\n\nLet's load the dataset and take an initial look at its structure.",
+      "code": "import pandas as pd\n\n# Load the dataset\ndf = pd.read_csv('Hitters.csv')\ndf.head()"
+    },
+    {
+      "section": "3. Data Dictionary",
+      "markdown": "# 3. Data Dictionary\n\n| Column      | Description                                       |\n|-------------|-------------------------------------------------|\n| AtBat       | Number of times at bat in 1986                   |\n| Hits        | Number of hits in 1986                           |\n| HmRun       | Number of home runs in 1986                      |\n| Runs        | Number of runs in 1986                           |\n| RBI         | Number of runs batted in in 1986                 |\n| Walks       | Number of walks in 1986                          |\n| Years       | Number of years in the major leagues             |\n| CAtBat      | Career times at bat (up to 1986)                 |\n| CHits       | Career hits (up to 1986)                         |\n| CHmRun      | Career home runs (up to 1986)                    |\n| CRuns       | Career runs (up to 1986)                         |\n| CRBI        | Career RBIs (up to 1986)                         |\n| CWalks      | Career walks (up to 1986)                        |\n| League      | League at the end of 1986 (A = American, N = National) |\n| Division    | Division at the end of 1986 (E = East, W = West) |\n| PutOuts     | Number of put outs in 1986                       |\n| Assists     | Number of assists in 1986                        |\n| Errors      | Number of errors in 1986                         |\n| Salary      | 1987 annual salary (in thousands)                |\n| NewLeague   | League at the start of 1987 (A = American, N = National) |",
+      "code": ""
+    },
+    {
+      "section": "4. Exploratory Data Analysis (EDA)",
+      "markdown": "# 4. Exploratory Data Analysis (EDA)\n\nLet's explore the data to understand its structure and spot any issues.",
+      "code": ""
+    },
+    {
+      "subsection": "4.1 Missing Values",
+      "code": "# Check for missing values\ndf.isnull().sum()"
+    },
+    {
+      "subsection": "4.2 Data Types",
+      "code": "# Display data types\ndf.dtypes"
+    },
+    {
+      "subsection": "4.3 Descriptive Statistics",
+      "code": "# Summary statistics\ndf.describe()"
+    },
+    {
+      "subsection": "4.4 Categorical Variable Distribution",
+      "code": "# Value counts for categorical columns\nfor col in ['League', 'Division', 'NewLeague']:\n    print(df[col].value_counts())"
+    },
+    {
+      "subsection": "4.5 Target Variable Distribution",
+      "code": "import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# Distribution of Salary\nsns.histplot(df['Salary'].dropna(), kde=True)\nplt.title('Salary Distribution')\nplt.show()"
+    },
+    {
+      "section": "5. Data Visualization",
+      "markdown": "# 5. Data Visualization\n\nVisualize relationships and patterns in the data.",
+      "code": ""
+    },
+    {
+      "subsection": "5.1 Correlation Heatmap",
+      "code": "plt.figure(figsize=(12,8))\nsns.heatmap(df.corr(), annot=True, cmap='coolwarm')\nplt.title('Correlation Heatmap')\nplt.show()"
+    },
+    {
+      "subsection": "5.2 Feature Relationships",
+      "code": "sns.pairplot(df, vars=['AtBat', 'Hits', 'HmRun', 'Runs', 'RBI', 'Walks', 'Salary'])\nplt.show()"
+    },
+    {
+      "subsection": "5.3 Boxplots",
+      "code": "sns.boxplot(x='Division', y='Salary', data=df)\nplt.title('Salary by Division')\nplt.show()"
+    },
+    {
+      "section": "6. Data Preprocessing",
+      "markdown": "# 6. Data Preprocessing\n\nPrepare the data for modeling by handling missing values, encoding categorical variables, and scaling features.",
+      "code": ""
+    },
+    {
+      "subsection": "6.1 Handling Missing Values",
+      "code": "df['Salary'].fillna(df['Salary'].median(), inplace=True)"
+    },
+    {
+      "subsection": "6.2 Encoding Categorical Variables",
+      "code": "df = pd.get_dummies(df, columns=['League', 'Division', 'NewLeague'], drop_first=True)"
+    },
+    {
+      "subsection": "6.3 Feature Scaling",
+      "code": "from sklearn.preprocessing import StandardScaler\n\nscaler = StandardScaler()\nnum_cols = df.select_dtypes(include=['float64', 'int64']).columns.drop('Salary')\ndf[num_cols] = scaler.fit_transform(df[num_cols])"
+    },
+    {
+      "section": "7. Feature Engineering (Optional)",
+      "markdown": "# 7. Feature Engineering (Optional)\n\nCreate or transform features to improve model performance.",
+      "code": "df['BattingAverage'] = df['Hits'] / df['AtBat']"
+    },
+    {
+      "section": "8. Model Preparation",
+      "markdown": "# 8. Model Preparation\n\nSplit the data into training and testing sets and define features and target.",
+      "code": ""
+    },
+    {
+      "subsection": "8.1 Train-Test Split",
+      "code": "from sklearn.model_selection import train_test_split\n\nX = df.drop('Salary', axis=1)\ny = df['Salary']\n\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)"
+    },
+    {
+      "section": "9. Model Building",
+      "markdown": "# 9. Model Building\n\nTrain and evaluate various regression models.",
+      "code": ""
+    },
+    {
+      "subsection": "9.1 Linear Regression (Baseline)",
+      "code": "from sklearn.linear_model import LinearRegression\nfrom sklearn.metrics import mean_squared_error, r2_score\n\nlr = LinearRegression()\nlr.fit(X_train, y_train)\ny_pred_lr = lr.predict(X_test)\n\nprint('Linear Regression RMSE:', mean_squared_error(y_test, y_pred_lr, squared=False))\nprint('Linear Regression R2:', r2_score(y_test, y_pred_lr))"
+    },
+    {
+      "subsection": "9.2 K-Nearest Neighbors Regression",
+      "code": "from sklearn.neighbors import KNeighborsRegressor\n\nknn = KNeighborsRegressor()\nknn.fit(X_train, y_train)\ny_pred_knn = knn.predict(X_test)\n\nprint('KNN RMSE:', mean_squared_error(y_test, y_pred_knn, squared=False))\nprint('KNN R2:', r2_score(y_test, y_pred_knn))"
+    },
+    {
+      "subsection": "9.3 Support Vector Regression",
+      "code": "from sklearn.svm import SVR\n\nsvr = SVR()\nsvr.fit(X_train, y_train)\ny_pred_svr = svr.predict(X_test)\n\nprint('SVR RMSE:', mean_squared_error(y_test, y_pred_svr, squared=False))\nprint('SVR R2:', r2_score(y_test, y_pred_svr))"
+    },
+    {
+      "subsection": "9.4 Decision Tree Regression",
+      "code": "from sklearn.tree import DecisionTreeRegressor\n\ndt = DecisionTreeRegressor(random_state=42)\ndt.fit(X_train, y_train)\ny_pred_dt = dt.predict(X_test)\n\nprint('Decision Tree RMSE:', mean_squared_error(y_test, y_pred_dt, squared=False))\nprint('Decision Tree R2:', r2_score(y_test, y_pred_dt))"
+    },
+    {
+      "subsection": "9.5 Random Forest Regression",
+      "code": "from sklearn.ensemble import RandomForestRegressor\n\nrf = RandomForestRegressor(random_state=42)\nrf.fit(X_train, y_train)\ny_pred_rf = rf.predict(X_test)\n\nprint('Random Forest RMSE:', mean_squared_error(y_test, y_pred_rf, squared=False))\nprint('Random Forest R2:', r2_score(y_test, y_pred_rf))"
+    },
+    {
+      "subsection": "9.6 Gradient Boosting Machines (GBM)",
+      "code": "from sklearn.ensemble import GradientBoostingRegressor\n\ngbm = GradientBoostingRegressor(random_state=42)\ngbm.fit(X_train, y_train)\ny_pred_gbm = gbm.predict(X_test)\n\nprint('GBM RMSE:', mean_squared_error(y_test, y_pred_gbm, squared=False))\nprint('GBM R2:', r2_score(y_test, y_pred_gbm))"
+    },
+    {
+      "subsection": "9.7 XGBoost",
+      "code": "import xgboost as xgb\n\nxgb_reg = xgb.XGBRegressor(random_state=42)\nxgb_reg.fit(X_train, y_train)\ny_pred_xgb = xgb_reg.predict(X_test)\n\nprint('XGBoost RMSE:', mean_squared_error(y_test, y_pred_xgb, squared=False))\nprint('XGBoost R2:', r2_score(y_test, y_pred_xgb))"
+    },
+    {
+      "subsection": "9.8 LightGBM",
+      "code": "import lightgbm as lgb\n\nlgb_reg = lgb.LGBMRegressor(random_state=42)\nlgb_reg.fit(X_train, y_train)\ny_pred_lgb = lgb_reg.predict(X_test)\n\nprint('LightGBM RMSE:', mean_squared_error(y_test, y_pred_lgb, squared=False))\nprint('LightGBM R2:', r2_score(y_test, y_pred_lgb))"
+    },
+    {
+      "subsection": "9.9 CatBoost",
+      "code": "from catboost import CatBoostRegressor\n\ncat_reg = CatBoostRegressor(verbose=0, random_state=42)\ncat_reg.fit(X_train, y_train)\ny_pred_cat = cat_reg.predict(X_test)\n\nprint('CatBoost RMSE:', mean_squared_error(y_test, y_pred_cat, squared=False))\nprint('CatBoost R2:', r2_score(y_test, y_pred_cat))"
+    },
+    {
+      "section": "10. Model Comparison",
+      "markdown": "# 10. Model Comparison\n\nCompare the performance of all models.",
+      "code": "results = pd.DataFrame({\n    'Model': ['Linear Regression', 'KNN', 'SVR', 'Decision Tree', 'Random Forest', 'GBM', 'XGBoost', 'LightGBM', 'CatBoost'],\n    'RMSE': [\n        mean_squared_error(y_test, y_pred_lr, squared=False),\n        mean_squared_error(y_test, y_pred_knn, squared=False),\n        mean_squared_error(y_test, y_pred_svr, squared=False),\n        mean_squared_error(y_test, y_pred_dt, squared=False),\n        mean_squared_error(y_test, y_pred_rf, squared=False),\n        mean_squared_error(y_test, y_pred_gbm, squared=False),\n        mean_squared_error(y_test, y_pred_xgb, squared=False),\n        mean_squared_error(y_test, y_pred_lgb, squared=False),\n        mean_squared_error(y_test, y_pred_cat, squared=False)\n    ],\n    'R2': [\n        r2_score(y_test, y_pred_lr),\n        r2_score(y_test, y_pred_knn),\n        r2_score(y_test, y_pred_svr),\n        r2_score(y_test, y_pred_dt),\n        r2_score(y_test, y_pred_rf),\n        r2_score(y_test, y_pred_gbm),\n        r2_score(y_test, y_pred_xgb),\n        r2_score(y_test, y_pred_lgb),\n        r2_score(y_test, y_pred_cat)\n    ]\n})\nresults.sort_values(by='RMSE')"
+    },
+    {
+      "section": "11. Hyperparameter Tuning (Optional)",
+      "markdown": "# 11. Hyperparameter Tuning (Optional)\n\nOptimize the best model's parameters for improved performance.",
+      "code": "from sklearn.model_selection import GridSearchCV\n\n# Example for Random Forest\nparam_grid = {\n    'n_estimators': [100, 200],\n    'max_depth': [None, 5, 10]\n}\ngrid = GridSearchCV(RandomForestRegressor(random_state=42), param_grid, cv=3, scoring='neg_root_mean_squared_error')\ngrid.fit(X_train, y_train)\nprint(\"Best Parameters:\", grid.best_params_)"
+    },
+    {
+      "section": "12. Feature Importance Analysis",
+      "markdown": "# 12. Feature Importance Analysis\n\nIdentify the most important features in the best-performing model.",
+      "code": "import matplotlib.pyplot as plt\nimport pandas as pd\n\nimportances = rf.feature_importances_\nfeature_names = X.columns\nfeat_imp = pd.Series(importances, index=feature_names).sort_values(ascending=False)\nfeat_imp.plot(kind='bar', figsize=(12,6))\nplt.title('Feature Importances')\nplt.show()"
+    },
+    {
+      "section": "13. Final Model and Predictions",
+      "markdown": "# 13. Final Model and Predictions\n\nRetrain the best model and make predictions on the test set.",
+      "code": "# Assuming Random Forest is the best\nbest_model = RandomForestRegressor(n_estimators=200, max_depth=10, random_state=42)\nbest_model.fit(X_train, y_train)\nfinal_preds = best_model.predict(X_test)\n\n# Show sample predictions\nimport pandas as pd\npd.DataFrame({'Actual': y_test, 'Predicted': final_preds}).head()"
+    },
+    {
+      "section": "14. Conclusion",
+      "markdown": "# 14. Conclusion\n\nSummarize the project, discuss model performance, and suggest potential improvements.",
+      "code": ""
+    },
+    {
+      "section": "15. References",
+      "markdown": "# 15. References\n\n- [Kaggle Hitters Dataset](https://www.kaggle.com/)\n- [Scikit-learn Documentation](https://scikit-learn.org/)\n- [Pandas Documentation](https://pandas.pydata.org/)",
+      "code": ""
+    }
+  ]
+}
